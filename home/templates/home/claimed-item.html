@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Claimed Item</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    {% include 'home/includes/navbar.html' %}
+
+    <div style="display: flex; justify-content: center;">
+        <div style="border-style: solid; border-width: thin; border-radius: 8px; padding: 15px; margin-top: 50px; ">
+            <h3>Congratulations!</h3>
+            <h5>We're so happy you've found your missing property.</h5>
+            {% if found_item.hub %}
+            <p> Your item can be picked up at {{ found_item.hub.name }}. If you need help or just want to say thanks, the person who recovered your item can be reached at <a href="mailto: {{found_item.user.email}}">{{found_item.user.email}}</a>.</p>
+                {% else %}
+            <p> Your item has not been dropped at a hub yet. The person who recovered it can be reached at <a href="mailto: {{found_item.user.email}}">{{found_item.user.email}}</a>.</p>
+                {% endif %}
+            <div style="display: flex; align-items: center;">
+                <form method="post">
+                    {% csrf_token %}
+                    <button style="width: 20vw; margin: 10px" class="btn btn-danger" type="submit" name="delete">Exit and Delete Item</button>
+                </form>
+            </div>
+                
+        </div>
+    </div>
+
+</body>

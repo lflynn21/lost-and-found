@@ -1,0 +1,25 @@
+.homeIcon:hover {
+    opacity: 0.6;
+}
+
+.hubRequest:hover {
+    opacity: 0.4;
+}
+
+.foundBtn,
+.lostBtn {
+    padding: 30px;
+    width: 40vw;
+    margin-right: 4vw;
+}
+
+.foundBtn {
+    margin-top: 20px;
+}
+
+.foundCard:hover,
+.lostCard:hover {
+    opacity: 0.6;
+}
+
+

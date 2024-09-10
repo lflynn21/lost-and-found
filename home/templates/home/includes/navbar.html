@@ -1,0 +1,97 @@
+<!-- navbar: include it in regular html pages by using \{% include %\} tag (bootstrap)
+source for implementation: https://ordinarycoders.com/blog/article/extend-and-include-django-template-tags -->
+{% load socialaccount %}
+
+<nav class="navbar navbar-light bg-light">
+    <div>
+        <a class="navbar-brand" href="/" style="padding-right: 20px; padding-left: 30px">
+            <i class="homeIcon fa-solid fa-house"></i>
+        </a>
+        <a href="{% url 'home:lost-items' %}" style="text-decoration: none; color: black; padding: 15px;">
+            Lost Items
+        </a>
+        <a href="{% url 'home:found-items' %}" style="text-decoration: none; color: black; padding: 15px;">
+            Found Items
+        </a>
+        <a href="{% url 'home:hubs' %}" style="text-decoration: none; color: black; padding: 15px;">
+            Hubs
+        </a>
+        <a href="{% url 'home:request-hub' %}" style="text-decoration: none; color: black; padding: 15px;">
+            Request a Hub
+        </a>
+        {% if user.is_staff %}
+        <a href="{% url 'home:approve-hubs' %}" style="text-decoration: none; color: black; padding: 15px;">
+            Approve Hubs
+        </a>
+        {% endif %}
+    </div>
+    <div style="margin-right:10px; display:flex; justify-content:right;">
+        <a class="navbar-brand" href="" style="" data-bs-toggle="modal" data-bs-target="#helpModal">
+            <!--icon source: https://fontawesome.com/icons/circle-question?f=classic&s=regular-->
+            <i class="fa-regular fa-circle-question"></i>
+        </a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-outline-dark" type="submit">Logout</button>
+        </form>
+        {% else %}
+        <form method="post" action="{% provider_login_url 'google' %}">
+            {% csrf_token %}
+            <button class="btn btn-dark" type="submit">Login</button>
+        </form>
+        {% endif %}
+    </div>
+</nav>
+
+<!-- Help Modal Popup-->
+<!-- Sources:
+    https://getbootstrap.com/docs/4.0/components/modal/#live-demo
+    https://stackoverflow.com/questions/68781917/bootstrap-modal-not-showing-in-django-template -->
+<div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="helpModalLabel">Help</h3>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>Report an item you lost</h4>
+                <p>Navigate to the page to <a href="{% url 'home:report-lost' %}">report a lost item</a>. Then, click the place
+                on the map closest to where you think you left it (the location does not need to be precise), and fill out
+                the form with as much information as you can: the type of item, a description of it, and (optionally) a
+                reward for the person who finds it. Press submit, and you're done!</p>
+                <p>Once you find the item, please remove it from the public listing by navigating to the
+                <a href="{% url 'home:lost-items' %}">lost items</a> page, finding the item and clicking the entry, and
+                pressing the red "Remove Posting" button. If you found your item because of a tip someone provided on the
+                <a href="{% url 'home:found-items' %}">found items</a> page or on the main menu, please navigate to the item
+                entry (via the <a href="{% url 'home:found-items' %}">found items</a> page or on the main menu) and click
+                "This is mine." This will show you info on the Samaritan who found your item, and will remove it from the
+                public list.</p>
+                <p>Remember, this service is for all of us; help keep it organized so others can better recover their lost
+                property too!</p>
+
+                <h4>Report an item you found which someone else lost</h4>
+                <p>Navigate to the page to <a href="{% url 'home:report-found' %}">report a found item</a>. Then, click the place
+                on the map closest to where you found it, and fill out the form with as much information as you can:
+                the type of item, a description of it, and the hub where you left it. Press submit to finish reporting it!</p>
+
+                <h4>But what's a hub?</h4>
+                <p>Hubs are designated locations around Grounds where people can leave items they found so the person who
+                lost it can recover their property. These strategically located places span Grounds at libraries, dining halls,
+                and other locations students frequent so there will be a safe and convenient place to drop off items other people lost</p>
+
+                <h4>Recommend a hub</h4>
+                <p>Do you have an idea of a good place where people can leave items they found? Suggest it on the
+                <a href="{% url 'home:request-hub' %}">request a hub</a> page by selecting a location on the map, enter a name and description,
+                and press submit. An admin will review the hub and hopefully approve it shortly!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dismiss</button>
+            </div>
+        </div>
+    </div>
+</div>

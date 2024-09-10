@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="static/lost-form.css">
+    <meta charset="UTF-8">
+    <title>Report a Found Item</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChJpbZx9oUQW9icVu5a4vespboJ_UwGxo"></script>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        /* Set the map container to fill the entire viewport */
+        #map {
+            width: 100%;
+            height: 75vh; /* 100% of the viewport height */
+        }
+
+        #homeIcon:hover{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    {% include 'home/includes/navbar.html' %}
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: center;">
+            <h2 class="heading">Submit a Found Item</h2>
+        </div>
+        <div style="display: flex; justify-content: space-evenly">
+            <div style="width: 50%; height: 50vh">
+                <h4>Where did you find the item?</h4>
+                <div id="map"></div>
+                {% for hub in hubs %}
+                {% endfor %}
+            </div>
+            <div style="display: flex; flex-direction: column; margin-top: 120px;">
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    {{ found_item_form.category.errors }}
+                    <label for="id_category">Category:</label>
+                    <br><br>
+                    {{ found_item_form.category }}
+                </div>
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    {{ found_item_form.description.errors }}
+                    <label for="id_item_description">Item Description:</label>
+                    <br><br>
+                    {{ found_item_form.item_description }}
+                </div>
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    {{ found_item_form.hub.errors }}
+                    <label for="id_hub">Which hub was this item dropped off at?</label>
+                    <br><br>
+                    {{ found_item_form.hub }}
+                </div>
+                <input type="hidden" name="latitude" id="latitude" value="">
+                <input type="hidden" name="longitude" id="longitude" value="">
+                <button class="btn btn-outline-dark" style="margin-right: 10px;" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        var map;
+        var marker;
+        var rotundaPos = { lat: 38.033554, lng: -78.507980 }
+        var hubPos = { lat: 38.033754, lng: -78.507990 }
+        var latitude = document.getElementById('latitude')
+        var longitude = document.getElementById('longitude')
+        var hubs = JSON.parse('{{hubsJson|safe}}')
+        console.log(hubs)
+        var hubsMarkers = []
+        const testHub = document.createElement("div");
+        testHub.textContent = "$2.5M";
+
+
+        function initMap() {
+            var mapOptions = {
+                zoom: 17,
+                center: rotundaPos, // Replace with your default map center
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            google.maps.event.addListener(map, 'click', function(event) {
+                placeMarker(event.latLng)
+            });
+
+            // Function to place a marker at the clicked location
+            function placeMarker(location) {
+                var newMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                });
+
+                latitude.value = newMarker.getPosition().lat()
+                longitude.value = newMarker.getPosition().lng()
+
+                if (marker) {
+                    marker.setMap(null)
+                }
+
+                marker = newMarker
+            }
+
+            function placeHub(hub) {
+                var hubLoc = { lat: parseFloat(hub.lat), lng: parseFloat(hub.long) }
+                var newMarker = new google.maps.Marker({
+                    position: hubLoc,
+                    map: map,
+                    icon: {                             
+                        url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    }
+                });
+
+                const contentString =
+                    '<div id="content">' +
+                    '<div id="siteNotice">' +
+                    "</div>" +
+                    '<h3 id="firstHeading">' + hub.name + '</h3>' +
+                    '<div id="bodyContent">' +
+                    "<p>" + hub.description +"</p>" +
+                    "</div>" +
+                    "</div>";
+                
+
+                const infowindow = new google.maps.InfoWindow({
+                    content: contentString,
+                    ariaLabel: hub.name,
+                    });
+                
+                newMarker.addListener("click", () => {
+                    infowindow.open({
+                        anchor: newMarker,
+                        map,
+                    });
+                    });
+                hubsMarkers.push(newMarker)
+            }
+
+            placeMarker(rotundaPos)
+
+            for (let hub of hubs) {
+                placeHub(hub)
+                console.log(hubsMarkers)
+            }
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+</body>
+</html>

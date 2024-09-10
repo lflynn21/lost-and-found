@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hubs</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        #homeIcon:hover{
+            opacity: 0.6;
+        }
+
+        #hubCard:hover{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    {% include 'home/includes/navbar.html' %}
+
+    <div style="display: flex; justify-content: center;">
+        <h2 style="padding: 20px;">Active Hubs</h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; margin-right: 10vw; margin-left: 10vw;">
+        {% for hub in hubs %}
+            <a id="hubCard" href="{% url 'home:hub-detail' hub.id %}" style="text-decoration: none; color: black;">
+            <div class="card" style="margin: 10px; padding-right: 1vw; padding-left: 1vw;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ hub.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ item.location }}</h6>
+                    <p class="card-text">{{ hub.description }}</p>
+                </div>
+            </div>
+            </a>
+        {% endfor %}
+    </div>
+</body>

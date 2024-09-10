@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+{% load socialaccount %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+{% load static %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="static/index.css">
+</head>
+<body>
+
+    {% include 'home/includes/navbar.html' %}
+
+    {% if show_hub_alert %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        You have successfully submitted a Hub! Check back soon to see if it was approved by an administrator. Thanks!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if show_found_alert %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        You have successfully submitted a found item! If someone claims this item, you will be notified via email. Thanks!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if show_lost_alert %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        You have successfully submitted a lost item! Check back soon to see if it was reported found. Good luck!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    <div style="display: flex; background-image: linear-gradient(#72c8ed, #cae3ed); justify-content: space-between; padding: 60px; padding-bottom: 60px;">
+        <div style="margin-left: 4vw;">
+            <h1 class="display-3" id="welcomeMessage"> Welcome, <span id="usernameSpan">{{ user.username }}</span></h1>
+            {% if user.is_staff %}
+            <p style="opacity: 0.4"> Signed in as an admin </p>
+            {% else %}
+            <p style="opacity: 0.4"> Signed in as a user </p>
+            {% endif %}
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: space-around;">
+            <a style="text-decoration: none; color: black;" href="{% url 'home:report-lost' %}">
+                <button type="button" class="lostBtn btn btn-outline-dark btn-lg btn-block">
+                    I lost something <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </a>
+            <a style="text-decoration: none; color: black;" href="{% url 'home:report-found' %}">
+                <button type="button" class="foundBtn btn btn-outline-dark btn-lg btn-block">
+                    I found something <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </a>
+        </div>
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <div style="background-color: white; width: 45vw">
+            <h3 style="padding: 20px"> Recently Lost Items</h3>
+            {% for item in lost_item_list %}
+            <a style="text-decoration: none; color: black;" href="{% url 'home:lost-detail' pk=item.pk %}">
+                <div class="lostCard card" style="margin: 10px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.category }}</h5>
+                        <h6 style="float: right"> Reward: ${{item.reward}}</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ item.sub_date }}</h6>
+                        <p class="card-text">{{ item.description }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div style="background-color: white; width: 45vw">
+            <h3 style="padding: 20px"> Recently Found Items</h3>
+            {% for item in found_item_list %}
+            <a style="text-decoration: none; color: black;" href="{% url 'home:found-detail' pk=item.pk %}">
+                <div class="foundCard card" style="margin: 10px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.category }}</h5>
+                        {% if item.hub %}
+                        <h6 class="card-subtitle mb-2">Hub: {{ item.hub.name }}</h6>
+                        {% endif %}
+                        <h6 class="card-subtitle mb-2 text-muted">{{ item.found_date }}</h6>
+                        <p class="card-text">{{ item.item_description }}</p>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    // Get the username element
+const usernameElement = document.getElementById('usernameSpan');
+
+// Get the username text content and capitalize the first character
+const username = usernameElement.textContent.trim();
+const capitalizedUsername = username.charAt(0).toUpperCase() + username.slice(1);
+
+// Update the username in the HTML
+usernameElement.textContent = capitalizedUsername;
+
+
+</script>
+

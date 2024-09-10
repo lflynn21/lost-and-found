@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ hub.name }}</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        #homeIcon:hover{
+            opacity: 0.6;
+        }
+
+        #foundCard:hover{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    {% include 'home/includes/navbar.html' %}
+
+    <div style="display: flex; justify-content: center;">
+        <h2 style="padding: 20px;">{{ hub.name }}</h2>
+    </div>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; margin-right: 10vw; margin-left: 10vw;">
+        <h4>Found Items at this Hub:</h4>
+        {% for item in found_items %}
+            <a id = "foundCard" style="text-decoration: none; color: black;" href="{% url 'home:found-detail' pk=item.pk %}">
+                <div class="card" style="margin: 10px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.category }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ item.found_date }}</h6>
+                        <p class="card-text">{{ item.item_description }}</p>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Hubs</title>
+    <link rel="stylesheet" type="text/css" href="static/index.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChJpbZx9oUQW9icVu5a4vespboJ_UwGxo"></script>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        #homeIcon:hover {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    {% include 'home/includes/navbar.html' %}
+
+    <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Location (click to view on map)</th>
+            <th scope="col">Approve</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for hub in submitted_hubs %}
+                <tr>
+                    <th scope="row">{{hub.id}}</th>
+                    <th>{{hub.name}}</th>
+                    <th>{{hub.description}}</th>
+                    <th><a href="" style="text-decoration: none; color: black;" data-bs-toggle="modal" data-bs-target="#map-modal{{hub.id}}">{{hub.location}}</a></th>
+                    <th><a href="{% url 'home:approve-hub' hub.id %}"><button type="button" class="btn btn-success">Approve</button></a></th>
+                </tr>
+
+            <!-- location modal -->
+            <!-- Sources:
+            https://getbootstrap.com/docs/4.0/components/modal/#live-demo
+            https://stackoverflow.com/questions/68781917/bootstrap-modal-not-showing-in-django-template -->
+            <div class="modal fade" id="map-modal{{hub.id}}" tabindex="-1" role="dialog" aria-labelledby="mapModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="mapModalLabel">Hub Location</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                    <!-- map code adopted from other pages using the Google Maps API -->
+                  <div class="modal-body">
+                      <div id="map{{hub.id}}" style="width: 100%; height: 75vh;"></div>
+                      <script>
+                        var map{{hub.id}};
+                        var marker{{hub.id}};
+                        var latitude{{hub.id}} = document.getElementById('latitude')
+                        var longitude{{hub.id}} = document.getElementById('longitude')
+                        var itemPos{{hub.id}} = { lat: {{ hub.location.latitude }}, lng: {{ hub.location.longitude }} };
+
+                        function initMap() {
+                            var mapOptions{{hub.id}} = {
+                                zoom: 17,
+                                center: itemPos{{hub.id}}, // Replace with your default map center
+                            };
+                            map{{hub.id}} = new google.maps.Map(document.getElementById('map{{hub.id}}'), mapOptions{{hub.id}});
+
+                            // Function to place a marker at the clicked location
+                            function placeMarker(location{{hub.id}}) {
+                                var newMarker{{hub.id}} = new google.maps.Marker({
+                                    position: location{{hub.id}},
+                                    map: map{{hub.id}},
+                                    title: 'Custom Pin'
+                                });
+
+                                latitude{{hub.id}}.value = newMarker{{hub.id}}.getPosition().lat()
+                                longitude{{hub.id}}.value = newMarker{{hub.id}}.getPosition().lng()
+
+                                if (marker{{hub.id}}) {
+                                    marker.setMap(null)
+                                }
+                                marker{{hub.id}} = newMarker{{hub.id}}
+                            }
+                            placeMarker(itemPos{{hub.id}})
+                        }
+
+                        google.maps.event.addDomListener(window, 'load', initMap);
+                    </script>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dismiss</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+</body>
+</html>

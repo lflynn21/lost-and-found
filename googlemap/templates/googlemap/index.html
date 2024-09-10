@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+{% load static %}
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="googlemap/static/maps.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChJpbZx9oUQW9icVu5a4vespboJ_UwGxo"></script>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        /* Set the map container to fill the entire viewport */
+        #map {
+            width: 80%;
+            height: 80vh; /* 100% of the viewport height */
+            position: absolute;
+            top: 15%;
+            left: 10%;
+        }
+
+        #homeIcon:hover{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="/" style="padding-right: 20px; padding-left: 30px">
+            <i id="homeIcon" class="fa-solid fa-house"></i>
+        </a>
+        <form method="post" action="{% url 'account_logout' %}" style="margin: 0px;">
+            {% csrf_token %}
+            <button class="btn btn-outline-dark" style="margin-right: 10px;" type="submit">Logout</button>
+        </form>
+    </nav>
+
+    <div id="map"></div>
+
+    <form action="{% url 'googlemap:save_location' user.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="latitude" id="latitude" value="">
+        <input type="hidden" name="longitude" id="longitude" value="">
+        <input type="submit" value="Save">
+    </form>
+  
+    <script>
+        var map;
+        var marker;
+        var rotundaPos = { lat: 38.033554, lng: -78.507980 }
+        var latitude = document.getElementById('latitude')
+        var longitude = document.getElementById('longitude')
+
+
+        function initMap() {
+            var mapOptions = {
+                zoom: 17,
+                center: rotundaPos, // Replace with your default map center
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            google.maps.event.addListener(map, 'click', function(event) {
+                placeMarker(event.latLng)
+            });
+
+            // Function to place a marker at the clicked location
+            function placeMarker(location) {
+                var newMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: 'Custom Pin'
+                });
+
+                latitude.value = newMarker.getPosition().lat()
+                longitude.value = newMarker.getPosition().lng()
+
+                if (marker) {
+                    marker.setMap(null)
+                }
+                
+                marker = newMarker
+            }
+
+            placeMarker(rotundaPos)
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Map and Details</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChJpbZx9oUQW9icVu5a4vespboJ_UwGxo"></script>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        /* Set the map container to fill the entire viewport */
+        #map {
+            width: 100%;
+            height: 75vh; /* 100% of the viewport height */
+        }
+
+        #homeIcon:hover {
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'home/includes/navbar.html' %}
+
+    <div style="display: flex; justify-content: space-evenly; margin-top: 25px">
+        <div style="width: 50%; height: 50vh">
+            {% if found_item.hub %}
+            <h5> Where the item was <span style="color:red">found</span> and <span style="color:blue">dropped off: </span></h5>
+            {% else %}
+                <h5> Where the item was <span style="color:red">found</span>: </h5>
+            {% endif %}
+            <div id="map"></div>
+        </div>
+        <div style="display: flex; flex-direction: column;">
+            <div style="border-style: solid; border-width: thin; border-radius: 8px; padding: 15px; margin-top: 30px; ">
+                <h3 class="heading">{{ found_item.category }}</h3>
+                {% if found_item.hub %}
+                    <h6> Dropped off at {{ found_item.hub.name }} on {{ found_item.found_date }}</h6>
+                {% else %}
+                    <p> Found by {{found_item.user}} on {{ found_item.found_date }}</p>
+                {% endif %}
+                <p><span class="text-muted">Description:</span> {{ found_item.item_description }}</p>
+            </div>
+            <div style="display: flex; justify-content: center;">
+                <a href="{% url 'home:claimed-item' pk=found_item.pk %}">
+                    <button style="width: 20vw; margin: 10px auto;" type="button" class="btn btn-primary" name="delete">This is Mine!</button>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+
+    {% if found_item.hub %}
+    <script>
+        var map;
+        var marker;
+        var latitude = document.getElementById('latitude');
+        var longitude = document.getElementById('longitude');
+        var hub = JSON.parse('{{hubsJson|safe}}')
+        var hubLoc = { lat: {{ found_item.hub.location.latitude }}, lng: {{ found_item.hub.location.longitude }} };
+        var itemPos = { lat: {{ found_item.location.latitude }}, lng: {{ found_item.location.longitude }} };
+        const centerLat = (parseFloat(itemPos.lat) + parseFloat(hubLoc.lat)) / 2;
+        const centerLng = (parseFloat(itemPos.lng) + parseFloat(hubLoc.lng)) / 2;   
+        var center = { lat: centerLat, lng: centerLng  };
+
+        function initMap() {
+            var mapOptions = {
+                zoom: 17,
+                center: center, // Replace with your default map center
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            var hubMarker = new google.maps.Marker({
+                position: hubLoc,
+                map: map,
+                icon: {                             
+                    url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                }
+            });
+
+            // Function to place a marker at the clicked location
+            function placeMarker(location) {
+                var newMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: 'Custom Pin'
+                });
+
+                 // Create content for the info window
+
+                var contentString0 =
+                '<div><strong>Item dropoff location</strong></div>' + 
+                '<div><u>Hub:</u> ' + hub.name + '</div><u>Hub description:</u> '
+                + hub.description + '</div>';
+                
+                // Create an InfoWindow with the content
+                var infoWindow0 = new google.maps.InfoWindow({
+                    content: contentString0
+                });
+    
+
+                // Add click event listener to the marker to open the info window
+                hubMarker.addListener('click', function () {
+                    infoWindow0.open(map, hubMarker); // Open the info window when marker is clicked
+                });
+
+                var contentString1 = '<div><strong>Item found location</strong></div>';
+
+                // Create an InfoWindow with the content
+                var infoWindow1 = new google.maps.InfoWindow({
+                    content: contentString1
+                });
+    
+
+                // Add click event listener to the marker to open the info window
+                newMarker.addListener('click', function () {
+                    infoWindow1.open(map, newMarker); // Open the info window when marker is clicked
+                });
+
+                latitude.value = newMarker.getPosition().lat()
+                longitude.value = newMarker.getPosition().lng()
+
+                if (marker) {
+                    marker.setMap(null)
+                }
+                
+                marker = newMarker
+            }
+
+            placeMarker(itemPos)
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+    {% else %}
+    <script>
+        var map;
+        var marker;
+        var latitude = document.getElementById('latitude')
+        var longitude = document.getElementById('longitude')
+        var itemPos = { lat: {{ found_item.location.latitude }}, lng: {{ found_item.location.longitude }} };
+
+
+        function initMap() {
+            var mapOptions = {
+                zoom: 17,
+                center: itemPos, // Replace with your default map center
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+
+
+            // Function to place a marker at the clicked location
+            function placeMarker(location) {
+                var newMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: 'Custom Pin'
+                });
+
+                latitude.value = newMarker.getPosition().lat()
+                longitude.value = newMarker.getPosition().lng()
+
+                if (marker) {
+                    marker.setMap(null)
+                }
+
+                marker = newMarker
+            }
+
+            placeMarker(itemPos)
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+    {% endif %}
+</body>
+</html>

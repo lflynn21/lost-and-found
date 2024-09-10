@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+{% load socialaccount %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+{% load static %}
+
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="static/index.css">
+</head>
+<body>
+
+    {% include 'home/includes/navbar.html' %}
+
+    <div style="display: flex; background-image: linear-gradient(#72c8ed, #cae3ed); justify-content: space-between; padding: 60px; padding-bottom: 60px;">
+        <div style="margin-left: 4vw;">
+            <h1 class="display-3"> Hello there!</h1>
+            <p style="opacity: 0.4"> Welcome UVA's virtual lost & found. Log in to see what's been misplaced or recovered by your fellow students. </p>
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: space-around;" >
+            <button type="button"class="lostBtn btn btn-outline-dark btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#loginModal">
+                I lost something <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button type="button" class="foundBtn btn btn-outline-dark btn-lg btn-block" data-bs-toggle="modal" data-bs-target="#loginModal">
+                I found something <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center;">
+        <div style="background-color: white; width: 45vw" >
+            <h3 style="padding: 20px"> Recently Lost Items</h3>
+            {% for item in lost_item_list %}
+                <a style="text-decoration: none; color: black;" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <div class="lostCard card" style="margin: 10px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.category }}</h5>
+                        <h6 style="float: right"> Reward: Hidden - login for details</h6>
+                        <h6 class="card-subtitle mb-2 text-muted">Lost date: Hidden - login for details</h6>
+                        <p class="card-text">Description: Hidden - login for details</p>
+                    </div>
+                </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div style="background-color: white; width: 45vw" >
+            <h3 style="padding: 20px" > Recently Found Items</h3>
+            {% for item in found_item_list %}
+                <a style="text-decoration: none; color: black;" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <div class="foundCard card" style="margin: 10px">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item.category }}</h5>
+                        {% if item.hub %}
+                            <h6 class="card-subtitle mb-2">Hub: Hidden - login for details</h6>
+                        {% endif %}
+                        <h6 class="card-subtitle mb-2 text-muted">Found date: Hidden - login for details</h6>
+                        <p class="card-text">Description: Hidden - login for details</p>
+                    </div>
+                </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- Modal Popup-->
+    <!-- Sources:
+        https://getbootstrap.com/docs/4.0/components/modal/#live-demo
+        https://stackoverflow.com/questions/68781917/bootstrap-modal-not-showing-in-django-template -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Oops!</h5>
+            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Sorry! You need to be logged in to access this page.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <a style="text-decoration: none; color: black;" href="{% provider_login_url 'google' %}">
+              <button type="button" class="btn btn-primary" target="www.google.com">Login!</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+</html>
+

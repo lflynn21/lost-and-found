@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report a Lost Item</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyChJpbZx9oUQW9icVu5a4vespboJ_UwGxo"></script>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <style>
+        /* Set the map container to fill the entire viewport */
+        #map {
+            width: 100%;
+            height: 75vh; /* 100% of the viewport height */
+        }
+
+        #homeIcon:hover{
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    {% include 'home/includes/navbar.html' %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: center; margin: 20px;">
+            <h2 class="heading">Submit a Lost Item</h2>
+        </div>
+        <div style="display: flex; justify-content: space-evenly">
+            <div style="width: 50%; height: 50vh">
+                <h4>Where'd you last see it?</h4>
+                <div id="map"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: space-around; margin-top: 120px;">
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    {{ lost_item_form.category.errors }}
+                    <label for="id_category">Category:</label>
+                    <br><br>
+                    {{ lost_item_form.category }}
+                </div>
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    {{ lost_item_form.description.errors }}
+                    <label for="id_description">Description:</label>
+                    <br><br>
+                    {{ lost_item_form.description }}
+                </div>
+                <div class="fieldWrapper" style="margin-bottom: 20px">
+                    <label for="id_reward">Reward (optional - please enter in USD):</label>
+                    <br>{{ lost_item_form.reward.errors }}<br>
+                    <div class="input-group flex-nowrap">
+                        <!-- source to put $ next to input:
+                        https://getbootstrap.com/docs/5.0/forms/input-group/ -->
+                        <span class="input-group-text" id="addon-wrapping">$</span>
+                        {{ lost_item_form.reward }}
+                    </div>
+                </div>
+                <input type="hidden" name="latitude" id="latitude" value="">
+                <input type="hidden" name="longitude" id="longitude" value="">
+                <button class="btn btn-outline-dark" style="margin-right: 10px;" type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <script>
+        var map;
+        var marker;
+        var rotundaPos = { lat: 38.033554, lng: -78.507980 }
+        var latitude = document.getElementById('latitude')
+        var longitude = document.getElementById('longitude')
+
+
+        function initMap() {
+            var mapOptions = {
+                zoom: 17,
+                center: rotundaPos, // Replace with your default map center
+            };
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            google.maps.event.addListener(map, 'click', function(event) {
+                placeMarker(event.latLng)
+            });
+
+            // Function to place a marker at the clicked location
+            function placeMarker(location) {
+                var newMarker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: 'Custom Pin'
+                });
+
+                latitude.value = newMarker.getPosition().lat()
+                longitude.value = newMarker.getPosition().lng()
+
+                if (marker) {
+                    marker.setMap(null)
+                }
+                
+                marker = newMarker
+            }
+
+            placeMarker(rotundaPos)
+
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+</body>
+</html>

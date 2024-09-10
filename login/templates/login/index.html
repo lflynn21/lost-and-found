@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+{% load socialaccount %}
+{% load bootstrap5 %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+{% bootstrap_messages %}
+<html>
+<head>
+  <meta charset="UTF-8">
+    <title>Login</title>
+    <script src="https://kit.fontawesome.com/1b58b1cd02.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="static/index.css">
+</head>
+<body>
+
+  {% include 'home/includes/navbar.html' %}
+
+  <!-- Source: https://getbootstrap.com/docs/4.0/layout/grid/ -->
+  <div class="container">
+  <div class="row">
+    <div class="col">
+    </div>
+    <div class="col-6" style="padding-top: 90px;">
+        <h1 class="display-3" style="text-align: center;"> So much to do, so much to see!</h1>
+        <p> Login below for the best experience!</p>
+        <p> Otherwise, you won't be able to...
+        <ul>
+          <li>Report an item you lost</li>
+          <li>Report an item you found</li>
+          <li>See details about recently lost/found items</li>
+          <li>Suggest locations to drop off found items at</li>
+          <li>And more!</li></ul>
+        </p>
+        <div style="text-align: center;">
+          <a href="{% provider_login_url 'google' %}">
+            <button class="btn btn-dark" type="submit">
+              Login With Google
+            </button>
+          </a>
+        </div>
+    </div>
+  <div class="col">
+  </div>
+  </div>
+</body>
+</html>

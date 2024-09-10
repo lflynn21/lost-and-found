@@ -1,0 +1,8 @@
+Django
+gunicorn==21.2.0
+django-allauth
+dj-database-url
+googlemaps
+whitenoise
+django-heroku
+django-bootstrap-v5
